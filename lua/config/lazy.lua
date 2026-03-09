@@ -16,14 +16,11 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   spec = {
     { import = "plugins" },
+    { import = "plugins.lsp"}
   },
-  --[[performance = {
-    rtp = {
-       Impede o Lazy de remover caminhos críticos do sistema (como os parsers de /usr/lib)
-      reset = false, 
-    },
-    
+  checker = {
+    enabled = true,
+    notify = false,
   },
-  ]] 
   change_detection = { notify = false }
 })

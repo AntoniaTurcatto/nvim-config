@@ -1,56 +1,34 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  lazy = false,
+  version = false, -- use a última versão do master para evitar bugs de caminhos
   build = ":TSUpdate",
+  event = { "BufReadPost", "BufNewFile" },
   config = function()
-    local ts = require("nvim-treesitter")
-    local languages = {
-      "bash",
-      "css",
-      "dockerfile",
-      "go",
-      "html",
-      "javascript",
-      "json",
-      "lua",
-      "markdown",
-      "php",
-      "python",
-      "scss",
-      "sql",
-      "typescript",
-      "vim",
-      "yaml",
-      "rust",
-      "c",
-      "java"
-    }
+    -- Em vez de require direto no topo, fazemos o setup de forma segura
+    local status_ok, configs = pcall(require, "nvim-treesitter.configs")
+    if not status_ok then
+        return
+    end
 
-    ts.setup({})
-
-    -- NOTE: If languages fail to install or compilation hangs,
-    -- ensure 'tree-sitter-cli' is installed (e.g., :MasonInstall tree-sitter-cli).
-    -- If the issue persists, run :checkhealth nvim-treesitter to diagnose.
-
-    -- Use :TSInstall for manuall install languages
-    ts.install(languages)
-
-    -- Treesitter features for installed languages must be enabled manually
-    vim.api.nvim_create_autocmd("FileType", {
-      pattern = languages,
-      callback = function()
-        -- Enable native Neovim treesitter highlighting
-        vim.treesitter.start()
-
-        -- Configure code folding
-        vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-        vim.wo.foldmethod = "expr"
-        vim.wo.foldlevel = 99
-
-        -- Enable treesitter-based indentation
-        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-      end,
+    configs.setup({
+      ensure_installed = {
+        "bash", "css", "dockerfile", "go", "html", "javascript",
+        "json", "lua", "markdown", "php", "python", "scss",
+        "sql", "typescript", "vim", "yaml", "rust", "c", "java", "vimdoc", "query"
+      },
+      auto_install = true,
+      highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = false,
+      },
+      indent = {
+        enable = true,
+      },
     })
+
+    -- Configurações de folding (opcional)
+    vim.opt.foldmethod = "expr"
+    vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+    vim.opt.foldlevel = 99
   end,
 }
-
